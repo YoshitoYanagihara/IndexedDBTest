@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <UserTable :list="userList" />
+    <UserTable :list="userList" @delete="deleteUserWithId" />
     <AddUserForm @input="addUser" />
   </div>
 </template>
@@ -46,6 +46,12 @@ export default {
       } catch (error) {
         console.error(error);
       }
+    },
+    /**
+     * IDによるユーザ消去
+     */
+    async deleteUserWithId(id) {
+      console.log(id);
     },
   },
 }
