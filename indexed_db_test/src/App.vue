@@ -1,27 +1,40 @@
 <template>
   <div id="app">
+    <UserTable :list="userList" />
     <AddUserForm @input="addUser" />
   </div>
 </template>
 
 <script>
 import userStore from './modules/UserStore';
+import UserTable from './components/UserTable.vue';
 import AddUserForm from './components/AddUserForm.vue';
 
 export default {
   name: 'App',
   components: {
+    UserTable,
     AddUserForm,
   },
-  mounted: async function () {
-    try {
-      const list = await userStore.getAll();
-      console.log(list);
-    } catch (error) {
-      console.error(error);
+  data: function () {
+    return {
+      userList: [],
     }
   },
+  mounted: async function () {
+    await this.updateUserList();
+  },
   methods: {
+    /**
+     * ユーザリスト更新
+     */
+    async updateUserList() {
+      try {
+        this.userList = await userStore.getAll();
+      } catch (error) {
+        console.error(error);
+      }
+    },
     /**
      * ユーザ追加
      */
@@ -29,6 +42,7 @@ export default {
       try {
         await userStore.insert(name);
         alert("追加しました");
+        this.updateUserList();
       } catch (error) {
         console.error(error);
       }
