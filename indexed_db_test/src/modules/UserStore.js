@@ -40,6 +40,29 @@ class UserStore {
     }
 
     /**
+     * データ挿入
+     * @param {String} name 名前
+     */
+     async insert(name) {
+        await this._open();
+        
+        const self = this;
+        return new Promise((resolve, reject) => {
+            const transaction = self.db.transaction(storeName, 'readwrite');
+            const store = transaction.objectStore(storeName);
+            const request = store.add({ name: name });
+            request.onsuccess = () => {
+                self._close();
+                resolve();
+            }
+            request.onerror = (error) => {
+                self._close();
+                reject(error);
+            }
+        });
+    }
+
+    /**
      * 開く
      */
     async _open() {
@@ -66,25 +89,6 @@ class UserStore {
             this.conn.onsuccess = (event) => {
                 self.db = event.target.result;
                 resolve();
-            }
-        });
-    }
-
-    /**
-     * データ挿入
-     * @param {String} name 名前
-     */
-    insert(name) {
-        const self = this;
-        return new Promise((resolve, reject) => {
-            const transaction = self.db.transaction(storeName, 'readwrite');
-            const store = transaction.objectStore(storeName);
-            const request = store.add({ name: name });
-            request.onsuccess = () => {
-                resolve();
-            }
-            request.onerror = (error) => {
-                reject(error);
             }
         });
     }
