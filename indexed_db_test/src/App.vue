@@ -25,8 +25,13 @@ export default {
     /**
      * ユーザ追加
      */
-    addUser(name) {
-      alert(name);
+    async addUser(name) {
+      try {
+        await userStore.insert(name);
+        alert("追加しました");
+      } catch (error) {
+        console.error(error);
+      }
     },
   },
 }
