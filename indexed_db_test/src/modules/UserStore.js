@@ -44,7 +44,7 @@ class UserStore {
      */
     async _open() {
         const self = this;
-        const promise = new Promise((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             self.conn = indexedDB.open(dbName, dbVersion);
 
             // エラー発生
@@ -68,7 +68,6 @@ class UserStore {
                 resolve();
             }
         });
-        return promise;
     }
 
     /**
