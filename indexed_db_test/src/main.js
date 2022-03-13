@@ -1,8 +1,9 @@
 import Vue from 'vue';
 import App from './App.vue';
-import VeeValidate from 'vee-validate';
+import { extend } from 'vee-validate';
+import { required } from 'vee-validate/dist/rules';
 
-Vue.use(VeeValidate);
+extend('required', required);
 Vue.config.productionTip = false;
 
 new Vue({
