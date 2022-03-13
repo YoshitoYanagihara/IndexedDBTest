@@ -18,9 +18,29 @@ class UserStore {
     }
 
     /**
+     * 全列挙
+     */
+    getAll() {
+        this._open();
+
+        const transaction = this.db.transaction(storeName, 'readonly');
+        const store = transaction.objectStore(storeName);
+        const request = store.getAll();
+        const self = this;
+        request.onsuccess = (event) => {
+            self._close();
+            Promise.resolve(event.target.result);
+        }
+        request.onerror = (error) => {
+            self._close();
+            Promise.reject(error);
+        }
+    }
+
+    /**
      * 開く
      */
-    open() {
+    _open() {
         this.conn = indexedDB.open(dbName, dbVersion);
 
         // エラー発生
@@ -43,7 +63,7 @@ class UserStore {
     /**
      * 閉じる
      */
-    close() {
+    _close() {
         if (!this.conn) { return; }
         
         this.db = null;
