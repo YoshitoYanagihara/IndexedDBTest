@@ -34,6 +34,8 @@ class UserStore {
         this.conn.onupgradeneeded = (event) => {
             self.db = event.target.result;
 
+            // Store作成
+            // autoIncrementを有効にした'id'と言うカラムをキーとする
             self.db.createObjectStore(storeName, { keyPath: 'id', autoIncrement: true });
         }
     }
