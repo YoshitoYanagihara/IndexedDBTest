@@ -20,55 +20,63 @@ class UserStore {
     /**
      * 全列挙
      */
-    getAll() {
-        this._open();
+    async getAll() {
+        await this._open();
 
-        const transaction = this.db.transaction(storeName, 'readonly');
-        const store = transaction.objectStore(storeName);
-        const request = store.getAll();
         const self = this;
-        request.onsuccess = (event) => {
-            self._close();
-            Promise.resolve(event.target.result);
-        }
-        request.onerror = (error) => {
-            self._close();
-            Promise.reject(error);
-        }
+        return new Promise((resolve, reject) => {
+            const transaction = self.db.transaction(storeName, 'readonly');
+            const store = transaction.objectStore(storeName);
+            const request = store.getAll();
+            request.onsuccess = (event) => {
+                self._close();
+                resolve(event.target.result);
+            }
+            request.onerror = (error) => {
+                self._close();
+                reject(error);
+            }    
+        });
     }
 
     /**
      * 開く
      */
-    _open() {
-        this.conn = indexedDB.open(dbName, dbVersion);
-
-        // エラー発生
-        this.conn.onerror = (error) => {  
-            Promise.reject(error);
-        };
-
-        // DB更新
-        // ※バージョンを指定して開いた時、新しいバージョンが指定されていた場合も通る
+    async _open() {
         const self = this;
-        this.conn.onupgradeneeded = (event) => {
-            self.db = event.target.result;
+        const promise = new Promise((resolve, reject) => {
+            self.conn = indexedDB.open(dbName, dbVersion);
 
-            // Store作成
-            // autoIncrementを有効にした'id'と言うカラムをキーとする
-            self.db.createObjectStore(storeName, { keyPath: 'id', autoIncrement: true });
-        }
+            // エラー発生
+            self.conn.onerror = (error) => {  
+                reject(error);
+            };
+
+            // DB更新
+            // ※バージョンを指定して開いた時、新しいバージョンが指定されていた場合も通る
+            self.conn.onupgradeneeded = (event) => {
+                const db = event.target.result;
+
+                // Store作成
+                // autoIncrementを有効にした'id'と言うカラムをキーとする
+                db.createObjectStore(storeName, { keyPath: 'id', autoIncrement: true });
+            }
+
+            // DBが開かれた
+            this.conn.onsuccess = (event) => {
+                self.db = event.target.result;
+                resolve();
+            }
+        });
+        return promise;
     }
 
     /**
      * 閉じる
      */
     _close() {
-        if (!this.conn) { return; }
-        
+        this.db.close();
         this.db = null;
-        
-        this.conn.close();
         this.conn = null;
     }
 }
