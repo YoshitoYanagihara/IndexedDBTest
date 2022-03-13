@@ -71,6 +71,25 @@ class UserStore {
     }
 
     /**
+     * データ挿入
+     * @param {String} name 名前
+     */
+    insert(name) {
+        const self = this;
+        return new Promise((resolve, reject) => {
+            const transaction = self.db.transaction(storeName, 'readwrite');
+            const store = transaction.objectStore(storeName);
+            const request = store.add({ name: name });
+            request.onsuccess = () => {
+                resolve();
+            }
+            request.onerror = (error) => {
+                reject(error);
+            }
+        });
+    }
+
+    /**
      * 閉じる
      */
     _close() {
