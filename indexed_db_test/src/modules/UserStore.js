@@ -63,6 +63,29 @@ class UserStore {
     }
 
     /**
+     * IDから消去
+     * @param {Number} id ID
+     */
+    async deleteWithId(id) {
+        await this._open();
+        
+        const self = this;
+        return new Promise((resolve, reject) => {
+            const transaction = self.db.transaction(storeName, 'readwrite');
+            const store = transaction.objectStore(storeName);
+            const request = store.delete(id);
+            request.onsuccess = () => {
+                self._close();
+                resolve();
+            }
+            request.onerror = (error) => {
+                self._close();
+                reject(error);
+            }
+        });
+    }
+
+    /**
      * 開く
      */
     async _open() {

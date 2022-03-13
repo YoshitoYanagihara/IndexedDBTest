@@ -51,7 +51,13 @@ export default {
      * IDによるユーザ消去
      */
     async deleteUserWithId(id) {
-      console.log(id);
+      try {
+        await userStore.deleteWithId(id);
+        alert("削除しました");
+        this.updateUserList();
+      } catch (error) {
+        console.error(error);
+      }
     },
   },
 }
