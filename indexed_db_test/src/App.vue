@@ -4,9 +4,19 @@
 </template>
 
 <script>
+import userStore from './modules/UserStore';
+
 export default {
   name: 'App',
   components: {
+  },
+  mounted: async function () {
+    try {
+      const list = await userStore.getAll();
+      console.log(list);
+    } catch (error) {
+      console.error(error);
+    }
   },
 }
 </script>
